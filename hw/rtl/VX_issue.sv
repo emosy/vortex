@@ -156,9 +156,17 @@ module VX_issue #(
     reg [`PERF_CTR_BITS-1:0] perf_lsu_stalls;
     reg [`PERF_CTR_BITS-1:0] perf_csr_stalls;
     reg [`PERF_CTR_BITS-1:0] perf_gpu_stalls;
+    // assignment 1
+    reg [`PERF_CTR_BITS-1:0] perf_active_threads;
+    reg [$clog2(`NUM_THREADS+1) - 1:0] perf_active_threads_popcount_temp_out;
+    reg [`NUM_THREADS-1:0] perf_active_threads_popcount_temp_in;
 `ifdef EXT_F_ENABLE
     reg [`PERF_CTR_BITS-1:0] perf_fpu_stalls;
 `endif
+
+    // assignment 1
+    assign perf_active_threads_popcount_temp_in = ibuffer_if.tmask;
+    `POP_COUNT(perf_active_threads_popcount_temp_out, perf_active_threads_popcount_temp_in);
 
     always @(posedge clk) begin
         if (reset) begin
@@ -168,10 +176,18 @@ module VX_issue #(
             perf_lsu_stalls <= 0;
             perf_csr_stalls <= 0;
             perf_gpu_stalls <= 0;
+            // assignment 1
+            perf_active_threads <= 0;
         `ifdef EXT_F_ENABLE
             perf_fpu_stalls <= 0;
         `endif
         end else begin
+            // assignment 1
+            if (ibuffer_if.valid & ibuffer_if.ready) begin
+                // extend from $clog2($bits(`NUM_THREADS)+1) bits to `PERF_CTR_BITS bits
+                // pad with 0s
+                perf_active_threads <= perf_active_threads + {{(`PERF_CTR_BITS - $clog2(`NUM_THREADS+1)){1'b0}}, perf_active_threads_popcount_temp_out};
+            end
             if (decode_if.valid & ~decode_if.ready) begin
                 perf_ibf_stalls <= perf_ibf_stalls  + `PERF_CTR_BITS'd1;
             end
@@ -199,6 +215,8 @@ module VX_issue #(
     assign perf_issue_if.lsu_stalls = perf_lsu_stalls;
     assign perf_issue_if.csr_stalls = perf_csr_stalls;
     assign perf_issue_if.gpu_stalls = perf_gpu_stalls;
+    // assignment 1
+    assign perf_issue_if.active_threads = perf_active_threads;
 `ifdef EXT_F_ENABLE
     assign perf_issue_if.fpu_stalls = perf_fpu_stalls;
 `endif

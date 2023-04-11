@@ -105,7 +105,10 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
   uint64_t instrs = 0;
   uint64_t cycles = 0;
 
-#ifdef PERF_ENABLE    
+#ifdef PERF_ENABLE   
+  // assignment 1
+  uint64_t active_threads = 0;
+
   // PERF: pipeline stalls
   uint64_t ibuffer_stalls = 0;
   uint64_t scoreboard_stalls = 0;
@@ -170,6 +173,13 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
     cycles = std::max<uint64_t>(cycles_per_core, cycles);
 
   #ifdef PERF_ENABLE
+    // assignment 1
+    uint64_t active_threads_per_core = get_csr_64(staging_ptr, CSR_MPM_ACTIVE_THREADS);
+    if (num_cores > 1) {
+      fprintf(stream, "PERF: RYAN179: core%d: active threads=%ld\n", core_id, active_threads_per_core);
+    } 
+    active_threads += active_threads_per_core;
+
     // PERF: pipeline    
     // ibuffer_stall
     uint64_t ibuffer_stalls_per_core = get_csr_64(staging_ptr, CSR_MPM_IBUF_ST);
@@ -305,6 +315,12 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
   int dcache_bank_utilization = (int)((double(dcache_reads + dcache_writes) / double(dcache_reads + dcache_writes + dcache_bank_stalls)) * 100);
   int smem_bank_utilization = (int)((double(smem_reads + smem_writes) / double(smem_reads + smem_writes + smem_bank_stalls)) * 100);
   int mem_avg_lat = (int)(double(mem_lat) / double(mem_reads));
+
+  // assignment 1
+  // divide total active threads by cycle count and print # active threads per cycle
+  double active_threads_per_cycle = (double(active_threads) / double(cycles));
+  fprintf(stream, "PERF: RYAN322: active threads per cycle=%f\n", active_threads_per_cycle);
+
   fprintf(stream, "PERF: ibuffer stalls=%ld\n", ibuffer_stalls);
   fprintf(stream, "PERF: scoreboard stalls=%ld\n", scoreboard_stalls);
   fprintf(stream, "PERF: alu unit stalls=%ld\n", alu_stalls);
