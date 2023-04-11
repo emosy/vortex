@@ -376,6 +376,15 @@ module VX_decode  #(
                         `USED_IREG (rs1);
                         `USED_IREG (rs2);
                     end
+                    // assignment 5
+                    //TODO: determine if 3'h5 is used for texture (should be 3'h6 ?) but it should be fine
+                    3'h5: begin
+                        op_type = `INST_OP_BITS'(`INST_GPU_PRED);
+                        ex_type = `EX_LSU;
+                        //TODO: sign extend rs1 to 32 bits?
+                        `USED_IREG (rs1);
+
+                    end
                 `ifdef EXT_TEX_ENABLE
                     3'h5: begin
                         op_type = `INST_OP_BITS'(`INST_GPU_TEX);

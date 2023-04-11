@@ -17,6 +17,8 @@ interface VX_lsu_req_if ();
     wire [`NR_BITS-1:0]             rd;
     wire                            wb;
     wire                            ready;
+    // assignment 5
+    wire                            is_prefetch;
 
     modport master (
         output valid,
@@ -30,7 +32,9 @@ interface VX_lsu_req_if ();
         output offset,
         output rd,
         output wb,
-        input  ready
+        input  ready,
+        // assignment 5
+        output is_prefetch
     );
 
     modport slave (
@@ -45,7 +49,9 @@ interface VX_lsu_req_if ();
         input  offset,
         input  rd,
         input  wb,
-        output ready
+        output ready,
+        // assignment 5
+        input is_prefetch
     );
 
 endinterface
