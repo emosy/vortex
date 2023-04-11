@@ -176,6 +176,11 @@ module VX_csr_data #(
             `CSR_MPM_BRANCHES   : read_data_r = perf_pipeline_if.branches[31:0];
             `CSR_MPM_BRANCHES_H : read_data_r = 32'(perf_pipeline_if.branches[`PERF_CTR_BITS-1:32]);
             // PERF: icache
+
+            // assignment 2
+            `CSR_MPM_DUPE_REQS : read_data_r = perf_memsys_if.dupe_reqs[31:0];
+            `CSR_MPM_DUPE_REQS_H : read_data_r = 32'(perf_memsys_if.dupe_reqs[`PERF_CTR_BITS-1:32]);
+
             `CSR_MPM_ICACHE_READS       : read_data_r = perf_memsys_if.icache_reads[31:0];
             `CSR_MPM_ICACHE_READS_H     : read_data_r = 32'(perf_memsys_if.icache_reads[`PERF_CTR_BITS-1:32]);
             `CSR_MPM_ICACHE_MISS_R      : read_data_r = perf_memsys_if.icache_read_misses[31:0];

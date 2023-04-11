@@ -106,6 +106,9 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
   uint64_t cycles = 0;
 
 #ifdef PERF_ENABLE    
+  // assignment 2
+  uint64_t dupe_reqs = 0;
+
   // PERF: pipeline stalls
   uint64_t ibuffer_stalls = 0;
   uint64_t scoreboard_stalls = 0;
@@ -170,6 +173,14 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
     cycles = std::max<uint64_t>(cycles_per_core, cycles);
 
   #ifdef PERF_ENABLE
+
+    // assignment 2
+    uint64_t dupe_reqs_per_core = get_csr_64(staging_ptr, CSR_MPM_DUPE_REQS);
+    if (num_cores > 1) {
+      fprintf(stream, "PERF: RYAN180: core%d: dupe reqs=%ld\n", core_id, dupe_reqs_per_core);
+    }
+    dupe_reqs += dupe_reqs_per_core;
+
     // PERF: pipeline    
     // ibuffer_stall
     uint64_t ibuffer_stalls_per_core = get_csr_64(staging_ptr, CSR_MPM_IBUF_ST);
@@ -315,6 +326,10 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
   fprintf(stream, "PERF: loads=%ld\n", loads);
   fprintf(stream, "PERF: stores=%ld\n", stores);
   fprintf(stream, "PERF: branches=%ld\n", branches);
+
+  // assignment 2
+  fprintf(stream, "PERF: RYAN320: duplicate requests=%ld\n", dupe_reqs);
+
   fprintf(stream, "PERF: icache reads=%ld\n", icache_reads);
   fprintf(stream, "PERF: icache read misses=%ld (hit ratio=%d%%)\n", icache_read_misses, icache_read_hit_ratio);
   fprintf(stream, "PERF: dcache reads=%ld\n", dcache_reads);

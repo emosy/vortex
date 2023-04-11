@@ -150,6 +150,9 @@
 // Machine Performance-monitoring counters
 `define CSR_MPM_BASE                12'hB00
 `define CSR_MPM_BASE_H              12'hB80
+// assignment 2
+`define CSR_MPM_DUPE_REQS           12'hB1E	// duplicate requests
+`define CSR_MPM_DUPE_REQS_H         12'hB9E
 // PERF: pipeline
 `define CSR_MCYCLE                  12'hB00
 `define CSR_MCYCLE_H                12'hB80

@@ -15,6 +15,12 @@ module VX_lsu_unit #(
     // inputs
     VX_lsu_req_if.slave     lsu_req_if,
 
+    // assignment 2
+    `ifdef PERF_ENABLE
+    // this should be master so that this becomes an output
+    VX_perf_memsys_if.master perf_memsys_if,
+    `endif
+
     // outputs
     VX_commit_if.master     ld_commit_if,
     VX_commit_if.master     st_commit_if
@@ -162,20 +168,49 @@ module VX_lsu_unit #(
 
     wire [`NUM_THREADS-1:0] req_sent_mask_n = req_sent_mask | dcache_req_fire;
 
+    // assignment 2
+    reg [`PERF_CTR_BITS - 1:0] dupe_reqs;
+
     always @(posedge clk) begin
         if (reset) begin
             req_sent_mask <= 0;
             is_req_start  <= 1;
+            dupe_reqs <= 0;
         end else begin
             if (dcache_req_ready) begin
                 req_sent_mask <= 0;
                 is_req_start  <= 1;
+                // This is likely incorrect, but I don't understand why
+                // `ifdef PERF_ENABLE
+                // if (req_is_dup && is_req_start) begin
+                //     dupe_reqs <= dupe_reqs + `PERF_CTR_BITS'b1;
+                // end
+                // `endif
+                // another incorrect alternative
+                // `ifdef PERF_ENABLE
+                // dupe_reqs <= dupe_reqs + {{(`PERF_CTR_BITS-1){1'b0}},req_is_dup};
+                // `endif
             end else begin
                 req_sent_mask <= req_sent_mask_n;
                 is_req_start  <= (0 == req_sent_mask_n);
             end
         end
     end
+
+    // assignment 2
+    `ifdef PERF_ENABLE
+        assign perf_memsys_if.dupe_reqs = dupe_reqs;
+
+        always @(posedge clk) begin
+            if (reset) begin
+                dupe_reqs <= 0;
+            end else begin
+                if (| dcache_req_fire && req_is_dup) begin
+                    dupe_reqs <= dupe_reqs + `PERF_CTR_BITS'b1;
+                end
+            end
+        end
+    `endif
 
     // need to hold the acquired tag index until the full request is submitted
     reg [`LSUQ_ADDR_BITS-1:0] req_tag_hold;

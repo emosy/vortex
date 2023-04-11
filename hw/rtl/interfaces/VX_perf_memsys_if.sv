@@ -20,6 +20,9 @@ interface VX_perf_memsys_if ();
     wire [`PERF_CTR_BITS-1:0] mem_writes;
     wire [`PERF_CTR_BITS-1:0] mem_latency;
 
+    // assignment 2
+    wire [`PERF_CTR_BITS-1:0] dupe_reqs;
+
     modport master (
         output icache_reads,
         output icache_read_misses,
@@ -34,7 +37,9 @@ interface VX_perf_memsys_if ();
         output smem_bank_stalls,
         output mem_reads,
         output mem_writes,
-        output mem_latency
+        output mem_latency,
+        // assignment 2
+        output dupe_reqs
     );
 
     modport slave (
@@ -51,7 +56,9 @@ interface VX_perf_memsys_if ();
         input smem_bank_stalls,
         input mem_reads,
         input mem_writes,
-        input mem_latency
+        input mem_latency,
+        // assignment 2
+        input dupe_reqs
     );
 
 endinterface
