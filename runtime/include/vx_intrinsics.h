@@ -117,6 +117,11 @@ extern "C" {
 	__r;							            \
 })
 
+// assignment 5
+inline void vx_sw_prefetch(unsigned load_addr) {
+    asm volatile (".insn s 0x6b, 5, x0, 0(%0)" :: "r"(load_addr));
+}
+
 // Set thread mask
 inline void vx_tmc(unsigned thread_mask) {
     asm volatile (".insn s 0x6b, 0, x0, 0(%0)" :: "r"(thread_mask));
