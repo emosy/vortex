@@ -712,6 +712,12 @@ void Warp::execute(const Instr &instr, Pipeline *pipeline) {
         pipeline->stall_warp = true; 
         runOnce = true;       
       } break;
+      // assignment 5
+      case 5: {
+        // SWPREF
+        // use debug level 3 for now. if it doesn't print, lower the level
+        D(3, "*** Software Prefetch on address 0x" << std::hex << rsdata[0]);
+      }
       default:
         std::abort();
       }
